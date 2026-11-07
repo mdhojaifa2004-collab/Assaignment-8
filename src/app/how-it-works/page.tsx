@@ -80,6 +80,23 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      <section>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Link
+            href="/studios"
+            className="rounded-xl bg-[#ff263f] px-8 py-3 font-semibold transition hover:bg-red-700"
+          >
+            Explore Studios
+          </Link>
+          <Link
+            href="/singer-form"
+            className="rounded-xl border border-white px-8 py-3 font-semibold transition hover:bg-white/10"
+          >
+            Singer Registration
+          </Link>
+        </div>
+      </section>
+
       {/* Creators */}
       <section className="px-6 py-16">
         <div className="mx-auto max-w-7xl">
@@ -166,22 +183,10 @@ export default function HowItWorksPage() {
             Ready to <span className="text-[#ff263f]">get started?</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl leading-7 text-gray-400">
-            Find a studio for your next project or list your own space today.
+            Find a studio for your next project or register as a singer to get matched with the
+            right room.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link
-              href="/studios"
-              className="rounded-xl bg-[#ff263f] px-8 py-3 font-semibold transition hover:bg-red-700"
-            >
-              Explore Studios
-            </Link>
-            <Link
-              href="/add-studio"
-              className="rounded-xl border border-white px-8 py-3 font-semibold transition hover:bg-white/10"
-            >
-              Host Your Space
-            </Link>
-          </div>
+
         </div>
       </section>
     </main>

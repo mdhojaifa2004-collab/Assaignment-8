@@ -1,15 +1,30 @@
-
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/studios", label: "Explore Studios" },
+  { href: "/how-it-works", label: "How It Works" },
+  { href: "/about", label: "About Us" },
+  { href: "/my-bookings", label: "My Bookings" },
+  
+];
 
 export default function Navbar() {
-  return (
-    <nav className="w-full border-b-2 border-[#ff263f] bg-[#0b0506] text-white">
-      <div className="mx-auto flex h-[62px] max-w-[1200px] items-center justify-between px-5">
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  return (
+    <nav className="sticky top-0 z-50 w-full border-b-2 border-[#ff263f] bg-[#0b0506] text-white">
+      <div className="mx-auto flex h-[62px] max-w-[1200px] items-center justify-between px-5">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="28"
@@ -27,77 +42,59 @@ export default function Navbar() {
             <path d="m19 15-4-1-2 5" />
             <path d="m5 16 3-2 1 5" />
           </svg>
-
-          <span className="text-[22px] font-bold tracking-tight">
-            StudioSpace
-          </span>
+          <span className="text-[22px] font-bold tracking-tight">StudioSpace</span>
         </Link>
 
-        {/* Navigation Links */}
+        {/* Desktop links */}
         <div className="hidden items-center gap-1 md:flex">
-          <Link
-            href="/"
-            className="rounded-xl bg-[#ff263f] px-4 py-3 text-sm font-semibold"
-          >
-            Home
-          </Link>
-
-          <Link
-            href="/studios"
-            className="rounded-lg px-4 py-3 text-sm transition hover:text-[#ff263f]"
-          >
-            Explore Studios
-          </Link>
-
-          <Link
-            href="/how-it-works"
-            className="rounded-lg px-4 py-3 text-sm transition hover:text-[#ff263f]"
-          >
-            How It Works
-          </Link>
-
-          <Link
-            href="/about"
-            className="rounded-lg px-4 py-3 text-sm transition hover:text-[#ff263f]"
-          >
-            About Us
-          </Link>
-
-          {/* Theme Button */}
-          <button
-            type="button"
-            aria-label="Toggle theme"
-            className="ml-4 flex h-[38px] w-[38px] items-center justify-center rounded-xl border border-gray-600 text-lg hover:border-[#ff263f]"
-          >
-            ◐
-          </button>
-
-          {/* Login */}
-          <Link
-            href="/login"
-            className="ml-2 rounded-xl border border-gray-500 px-4 py-2.5 text-sm font-semibold transition hover:border-[#ff263f]"
-          >
-            Login
-          </Link>
-
-          {/* Register */}
-          <Link
-            href="/register"
-            className="ml-2 rounded-xl bg-[#ff263f] px-4 py-2.5 text-sm font-semibold transition hover:bg-[#e51e35]"
-          >
-            Register
-          </Link>
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={
+                isActive(l.href)
+                  ? "rounded-xl bg-[#ff263f] px-4 py-3 text-sm font-semibold"
+                  : "rounded-lg px-4 py-3 text-sm transition hover:text-[#ff263f]"
+              }
+            >
+              {l.label}
+            </Link>
+          ))}
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile menu button */}
         <button
           type="button"
           className="text-2xl text-white md:hidden"
-          aria-label="Open menu"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          onClick={() => setOpen(!open)}
         >
-          ☰
+          {open ? "✕" : "☰"}
         </button>
       </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="border-t border-[#2d1a1d] bg-[#0b0506] px-5 pb-5 md:hidden">
+          <div className="flex flex-col gap-1 pt-3">
+            {links.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className={
+                  isActive(l.href)
+                    ? "rounded-xl bg-[#ff263f] px-4 py-3 text-sm font-semibold"
+                    : "rounded-lg px-4 py-3 text-sm hover:text-[#ff263f]"
+                }
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
