@@ -1,11 +1,14 @@
-
 "use client";
 
-import Image from "next/image";
+import { authClient } from "@/app/lib/auth-client";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 export default function SignUpPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -15,8 +18,9 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
 
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
@@ -31,16 +35,23 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      // Signup API/Auth integration will go here.
-      console.log({
+      const result = await authClient.signUp.email({
         name,
         email,
         password,
       });
 
-      alert("Signup form submitted!");
+      if (result.error) {
+        toast.error(result.error.message || "Signup failed. Please try again.");
+        return;
+      }
+
+      toast.success("Account created successfully!");
+      router.push("/sign-in");
+      router.refresh();
+
     } catch (error) {
-      console.error(error);
+      console.error("Signup error:", error);
       alert("Signup failed. Please try again.");
     } finally {
       setLoading(false);
@@ -114,6 +125,7 @@ export default function SignUpPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+
             {/* Name */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-300">
@@ -148,31 +160,11 @@ export default function SignUpPage() {
               />
             </div>
 
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300">
-                Image
-              </label>
-
-              <input
-                type="Imaige"
-                placeholder="Image URL"
-                value={URL}
-                onChange={(e) => setImage(e.target.value)}
-                required
-                autoComplete="image"
-                className="w-full rounded-xl border border-white/10 bg-[#0b0506] px-4 py-3.5 text-white outline-none transition placeholder:text-gray-600 focus:border-[#ff263f] focus:ring-2 focus:ring-[#ff263f]/20"
-              />
-            </div>
-
             {/* Password */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-300">
                 Password
               </label>
-
-
-
 
               <div className="relative">
                 <input
@@ -259,7 +251,7 @@ export default function SignUpPage() {
           <p className="mt-8 text-center text-sm text-gray-400">
             Already have an account?{" "}
             <Link
-              href="/auth/sign-in"
+              href="/sign-in"
               className="font-bold text-[#ff263f] transition hover:text-red-400"
             >
               Sign In

@@ -1,33 +1,56 @@
-
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
+import { authClient } from "@/app/lib/auth-client";
+import { toast } from "sonner";
 
 export default function SignInPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setLoading(true);
 
     try {
-      // Authentication integration will be added here.
-      console.log({
+      const result = await authClient.signIn.email({
         email,
         password,
         rememberMe,
       });
 
-      alert("Sign in form submitted!");
+      if (result.error) {
+        toast.error(result.error.message || "Sign in failed. Please try again.");
+        return;
+      }
+
+      // Successful login
+      toast.success("Welcome back! Sign in successful.");
+
+      const params = new URLSearchParams(window.location.search);
+      const callbackURL = params.get("callbackURL");
+
+      const safeURL =
+        callbackURL &&
+          callbackURL.startsWith("/") &&
+          !callbackURL.startsWith("//")
+          ? callbackURL
+          : "/";
+
+      router.replace(safeURL);
+      router.refresh();
+
     } catch (error) {
       console.error("Sign in error:", error);
-      alert("Sign in failed. Please try again.");
+      toast.error("Sign in failed. Please check your email and password.");
     } finally {
       setLoading(false);
     }
@@ -35,24 +58,23 @@ export default function SignInPage() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0b0506] px-4 py-12 text-white">
+
       {/* Background Glow */}
       <div className="pointer-events-none absolute left-[-150px] top-[-150px] h-[400px] w-[400px] rounded-full bg-[#ff263f]/10 blur-[120px]" />
 
       <div className="pointer-events-none absolute bottom-[-150px] right-[-150px] h-[400px] w-[400px] rounded-full bg-red-600/10 blur-[120px]" />
 
       <div className="relative grid w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-[#120b0c] shadow-2xl shadow-black/50 md:grid-cols-2">
+
         {/* Left Side */}
         <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-[#ff263f] via-[#a10d20] to-[#190507] p-10 md:flex">
+
           <div className="absolute inset-0 opacity-10">
             <div className="absolute left-10 top-10 h-40 w-40 rounded-full border-[30px] border-white" />
-
             <div className="absolute bottom-10 right-10 h-60 w-60 rounded-full border-[40px] border-white" />
           </div>
 
-          <Link
-            href="/"
-            className="relative text-2xl font-black tracking-tight"
-          >
+          <Link href="/" className="relative text-2xl font-black tracking-tight">
             Studio<span className="text-black">Space</span>
           </Link>
 
@@ -82,6 +104,7 @@ export default function SignInPage() {
 
         {/* Right Side */}
         <div className="p-6 sm:p-10 md:p-12">
+
           {/* Mobile Logo */}
           <Link
             href="/"
@@ -105,6 +128,7 @@ export default function SignInPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+
             {/* Email */}
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-300">
@@ -158,12 +182,11 @@ export default function SignInPage() {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="accent-[#ff263f]"
                 />
-
                 Remember me
               </label>
 
               <Link
-                href="/auth/forgot-password"
+                href="/forgot-password"
                 className="font-semibold text-[#ff263f] transition hover:text-red-400"
               >
                 Forgot Password?
@@ -178,18 +201,20 @@ export default function SignInPage() {
             >
               {loading ? "Signing In..." : "Sign In"}
             </button>
+
           </form>
 
           {/* Sign Up */}
           <p className="mt-8 text-center text-sm text-gray-400">
             Don&apos;t have an account?{" "}
             <Link
-              href="/auth/sign-up"
+              href="/sign-up"
               className="font-bold text-[#ff263f] transition hover:text-red-400"
             >
               Create Account
             </Link>
           </p>
+
         </div>
       </div>
     </main>
