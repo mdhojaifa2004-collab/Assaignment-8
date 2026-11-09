@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { studios } from "../../data/srudios";
+import { studios } from "../../data/studios";
 import { getRating } from "../../components/rating";
 
 const slugify = (text: string) =>

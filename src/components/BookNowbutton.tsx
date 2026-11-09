@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 type BookNowButtonProps = {
   studioId: string;
@@ -29,13 +30,18 @@ export default function BookNowButton({
   onSuccess,
 }: BookNowButtonProps) {
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
 
   const handleBooking = async () => {
+    // Guard against rapid double-clicks before React re-renders.
+    if (submittingRef.current) return;
+
     if (!date) {
-      alert("Please select a booking date.");
+      toast.error("Please select a booking date.");
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
 
     try {
@@ -56,6 +62,9 @@ export default function BookNowButton({
         "http://localhost:8000/my-bookings",
         {
           method: "POST",
+          // Required for cross-origin requests (localhost:3000 -> localhost:8000)
+          // so the Better Auth session cookie is sent to the backend.
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -63,17 +72,32 @@ export default function BookNowButton({
         }
       );
 
-      const result = await response.json();
+      const raw = await response.text();
 
-      if (!response.ok) {
-        throw new Error(result.message || "Booking failed");
+      let result: { message?: string } | null = null;
+      try {
+        result = raw ? JSON.parse(raw) : null;
+      } catch {
+        result = null;
       }
 
+      if (!response.ok) {
+        throw new Error(
+          result?.message || `Booking failed (${response.status})`
+        );
+      }
+
+      toast.success(result?.message || "Booking confirmed successfully!");
       onSuccess();
     } catch (error) {
       console.error("Booking error:", error);
-      alert("Booking save করা যায়নি! Please try again.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Booking save করা যায়নি! Please try again."
+      );
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };

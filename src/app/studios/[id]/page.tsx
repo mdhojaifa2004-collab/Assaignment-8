@@ -18,7 +18,7 @@ export default async function StudioDetailsPage({ params }: Props) {
     const callbackURL = `/studios/${encodeURIComponent(id)}`;
 
     redirect(
-      `/auth/sign-in?callbackURL=${encodeURIComponent(callbackURL)}`
+      `/sign-in?callbackURL=${encodeURIComponent(callbackURL)}`
     );
   }
 

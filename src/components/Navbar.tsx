@@ -35,7 +35,6 @@ const links = [
   { href: "/studios", label: "Explore Studios" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/about", label: "About Us" },
-  { href: "/my-bookings", label: "My Bookings" },
 ];
 
 export default function Navbar() {
@@ -44,42 +43,54 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
 
+  // Authentication session
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
 
+  // Active navigation link
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
+  // Close mobile menu
   const closeMenu = () => setOpen(false);
 
+  // Logout function
   const handleSignOut = async () => {
     try {
       await authClient.signOut();
+
       closeMenu();
-      router.push("/");
+      router.replace("/");
       router.refresh();
     } catch (error) {
       console.error("Sign out failed:", error);
     }
   };
 
+  // User Avatar
   const UserAvatar = () => (
     <Avatar className="h-10 w-10 border border-[#ff263f]">
       <AvatarImage
         src={user?.image || ""}
         alt={user?.name || "User"}
       />
+
       <AvatarFallback className="bg-[#ff263f] font-semibold text-white">
         {user?.name?.charAt(0)?.toUpperCase() || "U"}
       </AvatarFallback>
     </Avatar>
   );
 
+  // Profile Dropdown
   const ProfileDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 rounded-lg px-2 py-2 text-white outline-none transition hover:bg-[#ff263f]/10 focus-visible:ring-2 focus-visible:ring-[#ff263f]">
         <UserAvatar />
-        <span className="text-sm font-semibold">Profile</span>
+
+        <span className="text-sm font-semibold">
+          Profile
+        </span>
+
         <ChevronDown size={16} className="text-gray-400" />
       </DropdownMenuTrigger>
 
@@ -172,6 +183,20 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          {/* My Bookings: Only logged-in users */}
+          {!isPending && user && (
+            <Link
+              href="/my-bookings"
+              className={
+                isActive("/my-bookings")
+                  ? "rounded-xl bg-[#ff263f] px-4 py-3 text-sm font-semibold text-white"
+                  : "rounded-xl px-4 py-3 text-sm font-medium text-gray-300 transition hover:bg-[#ff263f]/10 hover:text-[#ff263f]"
+              }
+            >
+              My Bookings
+            </Link>
+          )}
         </div>
 
         {/* Desktop Authentication */}
@@ -181,14 +206,14 @@ export default function Navbar() {
           ) : (
             <>
               <Link
-                href="/sign-in"
+                href="/auth/sign-in"
                 className="rounded-lg border border-[#ff263f] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#ff263f]/10"
               >
                 Sign In
               </Link>
 
               <Link
-                href="/sign-up"
+                href="/auth/sign-up"
                 className="rounded-lg bg-[#ff263f] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600"
               >
                 Sign Up
@@ -214,6 +239,7 @@ export default function Navbar() {
         <div className="border-t border-[#2d1a1d] bg-[#0b0506] px-5 pb-5 md:hidden">
           <div className="flex flex-col gap-1 pt-3">
 
+            {/* Mobile Navigation */}
             {links.map((link) => (
               <Link
                 key={link.href}
@@ -229,13 +255,26 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Mobile Authentication */}
             {!isPending && (
               <div className="mt-3 border-t border-[#2d1a1d] pt-4">
 
                 {user ? (
                   <div className="flex flex-col gap-3">
 
+                    {/* My Bookings */}
+                    <Link
+                      href="/my-bookings"
+                      onClick={closeMenu}
+                      className={
+                        isActive("/my-bookings")
+                          ? "rounded-xl bg-[#ff263f] px-4 py-3 text-sm font-semibold text-white"
+                          : "rounded-lg border border-[#3b2025] px-4 py-3 text-sm text-white hover:bg-[#ff263f]/10"
+                      }
+                    >
+                      My Bookings
+                    </Link>
+
+                    {/* User Information */}
                     <div className="flex items-center gap-3">
                       <UserAvatar />
 
@@ -250,6 +289,7 @@ export default function Navbar() {
                       </div>
                     </div>
 
+                    {/* Profile Edit */}
                     <Link
                       href="/profile/edit"
                       onClick={closeMenu}
@@ -259,6 +299,7 @@ export default function Navbar() {
                       Profile Edit
                     </Link>
 
+                    {/* Sign Out */}
                     <button
                       type="button"
                       onClick={handleSignOut}
@@ -267,12 +308,12 @@ export default function Navbar() {
                       <LogOut size={17} />
                       Sign Out
                     </button>
-
                   </div>
                 ) : (
+                  /* Logged Out */
                   <div className="flex gap-3">
                     <Link
-                      href="/sign-in"
+                      href="/auth/sign-in"
                       onClick={closeMenu}
                       className="flex-1 rounded-lg border border-[#ff263f] px-4 py-3 text-center text-sm font-semibold text-white"
                     >
@@ -280,7 +321,7 @@ export default function Navbar() {
                     </Link>
 
                     <Link
-                      href="/sign-up"
+                      href="/auth/sign-up"
                       onClick={closeMenu}
                       className="flex-1 rounded-lg bg-[#ff263f] px-4 py-3 text-center text-sm font-semibold text-white"
                     >
@@ -288,7 +329,6 @@ export default function Navbar() {
                     </Link>
                   </div>
                 )}
-
               </div>
             )}
           </div>
