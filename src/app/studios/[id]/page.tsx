@@ -10,6 +10,10 @@ type Props = {
 export default async function StudioDetailsPage({ params }: Props) {
   const { id } = await params;
 
+  const token = await auth.api.getToken({
+    headers: await headers(),
+  })
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -18,7 +22,7 @@ export default async function StudioDetailsPage({ params }: Props) {
     const callbackURL = `/studios/${encodeURIComponent(id)}`;
 
     redirect(
-      `/sign-in?callbackURL=${encodeURIComponent(callbackURL)}`
+      `/auth/sign-in?callbackURL=${encodeURIComponent(callbackURL)}`
     );
   }
 

@@ -4,6 +4,12 @@
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
+// Base URL of the Express API (same env var used on the home page).
+// Falls back to the legacy dev listener on port 8000.
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+).replace(/\/+$/, "");
+
 type BookNowButtonProps = {
   studioId: string;
   studioName: string;
@@ -59,7 +65,7 @@ export default function BookNowButton({
       };
 
       const response = await fetch(
-        "http://localhost:8000/my-bookings",
+        `${API_BASE_URL}/my-bookings`,
         {
           method: "POST",
           // Required for cross-origin requests (localhost:3000 -> localhost:8000)

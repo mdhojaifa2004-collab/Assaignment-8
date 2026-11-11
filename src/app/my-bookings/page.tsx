@@ -18,7 +18,13 @@ type Booking = {
 
 type ToastType = "success" | "error";
 
-const API_URL = "http://localhost:8000/my-bookings";
+// Base URL of the Express API (same env var used on the home page).
+// Falls back to the legacy dev listener on port 8000.
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+).replace(/\/+$/, "");
+
+const API_URL = `${API_BASE_URL}/my-bookings`;
 
 export default function MyBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);

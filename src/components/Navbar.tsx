@@ -164,7 +164,7 @@ export default function Navbar() {
           </svg>
 
           <span className="text-[22px] font-bold tracking-tight">
-            StudioSpace
+            Studio <span className="text-[#f50722]">Space</span>
           </span>
         </Link>
 

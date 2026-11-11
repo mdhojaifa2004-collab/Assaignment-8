@@ -9,7 +9,7 @@ import {
   getBookings,
   removeBooking,
   clearBookings,
-} from "../components/booking";
+} from "./bookingStore";
 
 const slugify = (text: string) =>
   text

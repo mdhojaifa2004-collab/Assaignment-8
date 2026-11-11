@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/app/lib/auth-client";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "./ui/skeleton";
 
 /**
  * Guards private pages. Shows a skeleton while the BetterAuth session is
